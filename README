@@ -1,0 +1,120 @@
+################################################################################
+## Copyright (c) 2011, Glo Software
+## All rights reserved.
+## Licensed under the BSD License.
+## http://gloframework.com/license
+################################################################################
+
+
+
+COPYRIGHT
+========================================
+
+Copyright (c) 2011, Glo Framework
+All rights reserved.
+
+
+
+AUTHORS
+========================================
+
+Jason Kelly <jason@gloframework.com>
+
+
+
+INSTALLATION
+========================================
+
+
+
+
+
+FEATURE SUMMARY
+========================================
+
+
+
+
+
+BUILDING BLOCKS
+========================================
+
+Glo is glue.  Today there are many open source software packages available. The
+building blocks of Glo are a set of hand picked solutions for each layer in the
+stack:
+
+- Apache
+- PHP
+- Zend Framework
+- YUI3
+- handlebars
+
+
+
+SYSTEM REQUIREMENTS
+========================================
+
+Glo's system requirements are defined by the great open source 
+software that is the building blocks of Glo.
+
+bash
+PHP 5.2.4 or later
+
+
+
+INSTALLATION
+========================================
+
+* download
+* update config file
+* $ glo create project Example
+* $ sudo ln -s <root>/etc/dev-site.config /etc/apache2/sites-enabled 
+* $ sudo /etc/init.d/apache2 restart
+* visit your new site in a browser
+
+
+
+
+QUESTIONS AND FEEDBACK
+========================================
+
+Online documentation can be found at http://gloframework.com/documentation.
+You may also want to visit the forums at http://gloframework.com/forums.
+Any bugs that are found should be filed at http://gloframework.com/issues.
+If there are issues that can not be resolved in one of the above manners 
+please feel email your question to:
+
+feedback@gloframework.com
+
+
+
+LICENSE
+========================================
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the Glo Framework nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+
+
+
