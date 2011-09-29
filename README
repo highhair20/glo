@@ -1,5 +1,5 @@
 ################################################################################
-## Copyright (c) 2011, Glo Software
+## Copyright (c) 2011, Glo Framework
 ## All rights reserved.
 ## Licensed under the BSD License.
 ## http://gloframework.com/license
@@ -22,32 +22,28 @@ Jason Kelly <jason at gloframework.com>
 
 
 
-INSTALLATION
-========================================
-
-
-
-
-
 FEATURE SUMMARY
 ========================================
 
+This is only the beginning.  The feature list will grow as Glo grows.  
+Today we have:
+
+    - auto loading of js files based on module name
+    - client controller 
 
 
 
-
-BUILDING BLOCKS
+ABOUT
 ========================================
 
-Glo is glue.  Today there are many open source software packages available. The
-building blocks of Glo are a set of hand picked solutions for each layer in the
-stack:
+Glo provides an automated way of creating a seamless webapp designed with MVC 
+architecture in mind both on the server and the client. Glo is founded on the 
+following principals:
 
-- Apache
-- PHP
-- Zend Framework
-- YUI3
-- handlebars
+    - The end user's experience is, above all, the most important aspect of a web app.
+    - Technology limitations or hurdles should never limit or affect user's experience.
+    - When possible, ease the developers' live by automating what makes sense and
+      using intuitive defaults and conventions.
 
 
 
@@ -65,13 +61,12 @@ PHP 5.2.4 or later
 INSTALLATION
 ========================================
 
-* download
-* update config file
-* $ glo create project Example
-* $ sudo ln -s <root>/etc/dev-site.config /etc/apache2/sites-enabled 
-* $ sudo /etc/init.d/apache2 restart
-* visit your new site in a browser
-
+- download
+- update config file
+- $ glo create project Example
+- $ sudo ln -s <root>/etc/dev-site.config /etc/apache2/sites-enabled 
+- $ sudo /etc/init.d/apache2 restart
+- visit your new site in a browser
 
 
 
