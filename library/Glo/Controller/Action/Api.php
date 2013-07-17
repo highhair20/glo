@@ -1,0 +1,146 @@
+<?php
+/**
+ * Controller_Action
+ */
+abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
+    
+	public function assertIsAjaxRequest($errorMessage = NULL) {
+        if (!$this->_request->isXmlHttpRequest()) {
+        	$msg = $errorMessage ? $errorMessage : "This page was requested improperly. 
+            		This page can only be accessed via an ajax request.";
+            throw new Exception_Http404($msg);
+        }
+	}
+	
+	public function assertIsPost($errorMessage = NULL) {
+		if (!$this->_request->isPost()) {
+        	$msg = $errorMessage ? $errorMessage : "This page was requested improperly. 
+            		This page can only be requested with a POST.";
+            throw new Exception_Http404($msg);
+		}
+	}
+	
+    public function init() {
+        $data = $this->getRequestJson();
+        if (!$data)
+        {
+            $data = $this->getRequest();
+        }
+        if (is_numeric($data))
+        {
+            var_dump($data);
+            
+        }
+        if (array_key_exists('session_uuid', $data))
+        {
+            $_COOKIE['app'] = $data['session_uuid'];
+            Glo_Session::start($data['session_uuid']);
+        }
+        
+/*         $this->loggedInUser = App_Model_User::getLoggedIn(); */
+        
+        return parent::init();
+/*
+        // load the logged in user if there is one
+        $this->view->loggedInUser = User::getLoggedIn();
+        
+        // set the translate adapter
+        $this->registerTranslator();
+*/
+    }
+
+    public function getRequestJson($decoded = true)
+    {
+        // first try $_POST then look in raw post data
+        $frontController = $frontController = Zend_Controller_Front::getInstance();
+        $request = $frontController->getRequest();
+        $requestData = $request->getRawBody();
+        
+        // handle bad requests
+        if (!$requestData) 
+        {
+            $requestData = $this->_request->getPost();
+            if (is_array($requestData))
+            {
+                $decoded = false;
+            }
+        }
+        if (!$requestData) 
+        {
+            throw new Exception('no post data');
+            exit;
+        }
+/*         var_dump($requestData); */
+/*         var_dump(fopen("php://input", "rb")); */
+        if ($decoded)
+        {   
+            $requestData = @json_decode($requestData, true);
+            // check for an error condition where the request is not parsable
+            switch (json_last_error()) {
+                case JSON_ERROR_NONE:
+                    // no errors
+                    break;
+                case JSON_ERROR_DEPTH:
+                    // Maximum stack depth exceeded
+                case JSON_ERROR_STATE_MISMATCH:
+                    // Underflow or the modes mismatch
+                case JSON_ERROR_CTRL_CHAR:
+                    // Unexpected control character found
+                case JSON_ERROR_SYNTAX:
+                    // Syntax error, malformed JSON
+                case JSON_ERROR_UTF8:
+                    // Malformed UTF-8 characters, possibly incorrectly encoded
+                default:
+                    // Unknown error
+                    file_put_contents('/var/log/farmling/' . Util_Server::getEnvironmentString() . 'farmling-request.err', date('c') . ": " . print_r($_REQUEST, true) . "\n", FILE_APPEND);
+                    require_once 'Exception/InvalidRequest.php';
+                    throw new Exception_InvalidRequest('Sorry.  We are unable to process your request at this time.  Thanks for you patience');
+                    break;
+            }
+        }
+        return $requestData;
+    }
+    
+    public function setRequestJson($dataArray)
+    {
+        $_POST = json_encode($dataArray);
+    }
+
+    public function registerTranslator() {
+/*
+        $path = dirname(__FILE__) 
+            . '/../../../languages/'
+            . $this->_request->getControllerName() . '/'
+            . $this->_request->getActionName();
+        if (is_dir($path)) {
+            try {
+                $translate = new Zend_Translate(
+                    array(
+                        'adapter'           => 'ini',
+                        'content'           => $path,
+                        'locale'            => 'auto',
+                        'scan'              => Zend_Translate::LOCALE_FILENAME,
+                        'disableNotices'    => true,
+                    )
+                );
+                if ($translate->isAvailable($this->view->loggedInUser->languagePref)) {
+                    $translate->setLocale($this->view->loggedInUser->languagePref);
+                } else {
+                    $translate->setLocale('en');
+                }
+                $this->view->translate()->setTranslator($translate);
+            } catch (Exception $ex) {
+                // so, the language dir didn't exist...what're you gonna do    
+                echo $ex->getMessage() . "<br>\n";    
+            }
+        }
+*/
+    }
+
+    protected function _roundTripRedirect($url, $options = array()) {
+        Session::setParam('_roundTripRedirectUrl', $_SERVER['REQUEST_URI']);
+        return parent::_redirect($url, $options);
+    }
+    
+    
+} 
