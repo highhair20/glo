@@ -137,6 +137,8 @@ class Glo_Auth
      */
     public function clearIdentity()
     {
+        // Get a reference to the singleton instance of Zend_Auth
+        $this->_auth = Zend_Auth::getInstance();
         return $this->_auth->clearIdentity();
     }
 }

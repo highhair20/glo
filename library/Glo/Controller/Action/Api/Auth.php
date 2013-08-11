@@ -4,6 +4,71 @@
 class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
 {
     
+    
+    /**
+     * signupAction
+     *
+     * End Point:
+     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
+     * /auth/signup
+     * </pre>
+     *
+     * Sample Request:
+     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
+     * {
+     *     "user_uuid": "e77a48ed-ff5a-4c12-9a59-5c48379d3160",
+     *     "email": "johndoe@gmail.com",
+     *     "password": "foomanchu",
+     *     "first_name": "John",
+     *     "last_name": "Doe",
+     *     "phone": "3454346534",
+     *     "timezone": "America/Los_Angeles",
+     *     "opt_in": "1",
+     *     "zip_code": "90802",
+     *     "type": "chef",      (options: farm, chef)
+     * }
+     * </pre>
+     *
+     * Sample Response:
+     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
+     * {
+     *     "session_uuid":"361092b7-d0b8-406c-8409-41db2853baf2"
+     * }
+     * </pre>
+     *
+     * @return void
+     */
+    public function signupAction()
+    {
+        $form = new App_Form_Auth_Signup();
+        $jsonData = $this->getRequestJson();
+        if (!isset($jsonData['timezone']))
+        {
+            $jsonData['timezone'] = 'America/Los_Angeles';
+        }
+        if ($form->isValid($jsonData)) {
+            $createData = $form->getValues();
+            
+            // create user
+            $map = new App_Model_Map_User();
+            $this->view->user_uuid = $map->save($createData);
+            
+            // authenticate
+            $auth = Glo_Auth::getInstance();
+            $response = $auth->authenticate($createData['email'], $createData['password']);
+            $identity = $response->getIdentity();
+            $this->view->session_uuid = Zend_Session::getId();
+            
+            $this->_helper->json($this->view);
+            
+        } else {
+            throw new Glo_Exception_BadData(array_shift(array_shift($form->getMessages())));
+            
+        }
+        
+    }
+    
+    
     /**
      * loginAction
      * 
@@ -23,8 +88,8 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
      * Sample Response:
      * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
         {
-            "user_id": "e77a48ed-ff5a-4c12-9a59-5c48379d3160",
-            "session_id": "361092b7-d0b8-406c-8409-41db2853baf2"
+            "user_uuid": "e77a48ed-ff5a-4c12-9a59-5c48379d3160",
+            "session_uuid": "361092b7-d0b8-406c-8409-41db2853baf2"
         }
      * </pre>
      *
@@ -41,21 +106,81 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
             $auth = Glo_Auth::getInstance();
             $response = $auth->authenticate($data['email'], $data['password']);
             $identity = $response->getIdentity();
-            $this->view->session_id = Zend_Session::getId();
+            $this->view->session_uuid = Zend_Session::getId();
 
             $map = new App_Model_Map_User();
             $user = $map->findByEmail($identity);
-            $this->view->user_id = $user->user_uuid;
-            
+            $this->view->user_uuid = $user->user_uuid;
+
+            $this->_helper->json($this->view);
         }
         else
         {
-            throw new Exception_BadData(array_shift(array_shift($form->getMessages())));
-            
+            throw new Glo_Exception_BadData(array_shift(array_shift($form->getMessages())));
         }
         
-        $this->render('common/json', NULL, true);
     }
+    
+    
+
+    /**
+     * logoutAction
+     *
+     * End Point:
+     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
+     * /auth/logout
+     * </pre>
+     *
+     * Sample Request:
+     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
+     * {
+     *     "user_uuid":"e77a48ed-ff5a-4c12-9a59-5c48379d3160",
+     *     "session_uuid":"361092b7-d0b8-406c-8409-41db2853baf2"
+     * }
+     * </pre>
+     *
+     * Sample Response:
+     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
+     * {}
+     * </pre>
+     *
+     * @return void
+     */
+    public function logoutAction()
+    {
+        $form = new App_Form_Auth_Logout();
+        if ($form->isValid($this->getRequestJson())) {
+            $data = $form->getValues();
+            
+/*
+            $auth = Glo_Auth::getInstance();
+            $response = $auth->clearIdentity();
+            var_dump($response);
+*/
+            Zend_Session::destroy();
+            
+            $this->_helper->json($this->view);
+        }
+        else
+        {
+            throw new Glo_Exception_BadData(array_shift(array_shift($form->getMessages())));
+            
+        }
+
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -87,6 +212,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
      *
      * @return void
      */
+/*
     public function changePasswordAction()
     {
         $form = new App_Form_AuthChangePassword();
@@ -100,84 +226,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
         
         $this->render('common/json', NULL, true);
     }
-    
-
-    /**
-     * createAction
-     *
-     * End Point:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * /auth/create
-     * </pre>
-     *
-     * Sample Request:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * {
-     *     "user_uuid": "e77a48ed-ff5a-4c12-9a59-5c48379d3160",
-     *     "email": "johndoe@gmail.com",
-     *     "password": "foomanchu",
-     *     "first_name": "John",
-     *     "last_name": "Doe",
-     *     "phone": "3454346534",
-     *     "timezone": "America/Los_Angeles",
-     *     "opt_in": "1",
-     *     "zip_code": "90802",
-     *     "type": "chef",      (options: farm, chef)
-     * }
-     * </pre>
-     *
-     * Sample Response:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * {
-     *     "session_uuid":"361092b7-d0b8-406c-8409-41db2853baf2"
-     * }
-     * </pre>
-     *
-     * @return void
-     */
-    public function createAction()
-    {
-        $form = new App_Form_AuthCreate();
-        $jsonData = $this->getRequestJson();
-        if (!isset($jsonData['password']))
-        {
-            $jsonData['password'] = 'eatlocal';
-        }
-        if (!isset($jsonData['timezone']))
-        {
-            $jsonData['timezone'] = 'America/Los_Angeles';
-        }
-        if ($form->isValid($jsonData)) {
-            $createData = $form->getValues();
-            $createData['status'] = App_Model_User::STATUS_ACTIVE;            
-            $response = App_Model_User::create($createData);
-            foreach ($response as $k => $v)
-            {
-                $this->view->$k = $v;
-            }
-            $user = App_Model_User::fetch($response['user_uuid'], Db::CONN_READ_VOLATILE);
-            $business = null;
-            if ($createData['type'] == 'chef')
-            {
-                $user->addRestaurant(array(
-                    'user_uuid' => $response['user_uuid'],
-                    'name'      => $createData['business']
-                ));
-            }
-            elseif ($createData['type'] == 'farm')
-            {
-                $user->addFarm(array(
-                    'user_uuid' => $response['user_uuid'],
-                    'name'      => $createData['business']
-                ));
-            }
-
-        } else {
-            throw new Exception_BadData(array_shift(array_shift($form->getMessages())));
-        }
-        
-        $this->render('common/json', NULL, true);
-    }
+*/
 
 
     /**
@@ -205,6 +254,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
      *
      * @return void
      */
+/*
     public function deleteAction()
     {
         $form = new App_Form_AuthDelete();
@@ -221,47 +271,9 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
 
         $this->render('common/json', NULL, true);
     }
+*/
 
 
-    /**
-     * logoutAction
-     *
-     * End Point:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * /auth/logout
-     * </pre>
-     *
-     * Sample Request:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * {
-     *     "user_uuid":"e77a48ed-ff5a-4c12-9a59-5c48379d3160",
-     *     "session_uuid":"361092b7-d0b8-406c-8409-41db2853baf2"
-     * }
-     * </pre>
-     *
-     * Sample Response:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * {}
-     * </pre>
-     *
-     * @return void
-     */
-    public function logoutAction()
-    {
-        $form = new App_Form_AuthLogout();
-        if ($form->isValid($this->getRequestJson())) {
-            $data = $form->getValues();
-            App_Model_User::logout();
-        }
-        else
-        {
-            throw new Exception_BadData(array_shift(array_shift($form->getMessages())));
-            
-        }
-
-        $this->render('common/json', NULL, true);
-
-    }
     
      
     /**
@@ -289,6 +301,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
      *
      * @return void
      */
+/*
     public function resetPasswordAction()
     {
         $form = new App_Form_AuthResetPassword();
@@ -307,6 +320,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
 
         $this->render('common/json', NULL, true);
     }
+*/
     
     
     /**
@@ -314,6 +328,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
      *
      * @return void
      */
+/*
     public function finalizeResetPasswordAction()
     {
         $form = new App_Form_AuthFinalizeResetPassword();
@@ -340,6 +355,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
 
         $this->render('common/json', NULL, true);
     }
+*/
     
 }
 

@@ -5,25 +5,47 @@ abstract class Glo_Model_Map_Abstract
 
     public function save($data)
     {
-        $response = null;
+        $response = array();
         $dbAdapter = Zend_Registry::get(Glo_Db::CONN_WRITE);
         $table = $this->_getDbTable($dbAdapter);
+        
+        // scrub the data
+        $cols = $table->info('cols');
+        foreach ($data as $k => $v)
+        {
+            if (!in_array($k, $cols))
+            {
+                unset($data[$k]);
+            }
+        }
+        
+        //
         $pks = $table->info('primary');
         $isSequence = $table->info('sequence');
         if ($isSequence)
         {
             // if isSequence then it is assumed that the first 
-/*
-            if (null === ($id = $cleanData[$pk])) 
+            $pk = array_pop($pks);
+            if (!isset($data[$pk]) || null === ($id = $data[$pk])) 
             {
-                unset($cleanData[$pk]);
-                $response = $this->_getDbTable($dbAdapter)->insert($cleanData);
+                try
+                {
+                    $response = $this->_getDbTable($dbAdapter)->insert($data);
+                    var_dump($response);
+                }
+                catch (Zend_Db_Statement_Exception $e)
+                {
+                    if ($e->getCode() == 23000 && strstr($e->getMessage(), '1062'))
+                    {
+                        throw new Glo_Exception_DuplicateData(array_pop(explode('1062', $e->getMessage())));
+                    }
+                }
             } 
             else 
             {
+                $id = $data[$pk];
                 $response = $this->_getDbTable($dbAdapter)->update($data, array($pk . ' = ?' => $id));
             }
-*/
         }
         else
         {
@@ -43,7 +65,7 @@ abstract class Glo_Model_Map_Abstract
                         $params[$pk . ' = ?'] = $data[$pk];
                     }
                 }
-                $response = $this->_getDbTable($dbAdapter)->replace($data, $params);
+                $response = $this->_getDbTable($dbAdapter)->insertOrUpdate($data);
             }
             else
             {
@@ -51,30 +73,41 @@ abstract class Glo_Model_Map_Abstract
                 if (!isset($data[$pk]) || !$data[$pk]) 
                 {
                     $data[$pk] = $this->_getDbTable($dbAdapter)->generateId();
-                    $response = $this->_getDbTable($dbAdapter)->insert($data);
+                    try
+                    {
+                        $response = $this->_getDbTable($dbAdapter)->insert($data);
+                    }
+                    catch (Zend_Db_Statement_Exception $e)
+                    {
+                        if ($e->getCode() == 23000 && strstr($e->getMessage(), '1062'))
+                        {
+                            throw new Glo_Exception_DuplicateData(array_pop(explode('1062', $e->getMessage())));
+                        }
+                    }
                 } 
                 else            
                 {
                     // we don't know if this is new data or not
-                    $response = $this->_getDbTable($dbAdapter)->replace($data, array($pk . ' = ?' => $data[$pk]));
+                    $response = $this->_getDbTable($dbAdapter)->insertOrUpdate($data);
                 }
             }
         }
         return $response;
     }
-    
+
     
     public function find($id, $dbAdapterType = Glo_Db::CONN_READ)
     {
         $dbAdapter = Zend_Registry::get($dbAdapterType);
-        $result = $this->_getDbTable($dbAdapter)->find($id);
+        $dbTable = $this->_getDbTable($dbAdapter);
+        $result = $dbTable->find($id);
         if (0 == count($result)) 
         {
             return;
         }
         $row = $result->current();
         $classname = $this->_modelDictionary;
-        $model = new $classname($row);
+        $model = new $classname($row, $dbTable->getHiddenCols());
         return $model;
     }
  
@@ -82,12 +115,13 @@ abstract class Glo_Model_Map_Abstract
     public function fetchAll($count = 50, $offset = 0, $dbAdapterType = Glo_Db::CONN_READ)
     {
         $dbAdapter = Zend_Registry::get($dbAdapterType);
-        $resultSet = $this->_getDbTable($dbAdapter)->fetchAll();
+        $dbTable = $this->_getDbTable($dbAdapter);
+        $resultSet = $dbTable->fetchAll();
         $set = new Glo_Model_Set();
         foreach ($resultSet as $row) 
         {
             $classname = $this->_modelDictionary;
-            $set->add(new $classname($row));
+            $set->add(new $classname($row, $dbTable->getHiddenCols()));
         }
         return $set;
     }
@@ -105,7 +139,6 @@ abstract class Glo_Model_Map_Abstract
         }
         return $this->_dbTable;
     }
-    
     
     
 }

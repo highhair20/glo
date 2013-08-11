@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Model
+ * Glo_Model_Dict
  * 
  *
  */
@@ -9,12 +9,14 @@ abstract class Glo_Model_Dict
 {
 
     protected $_data = null;
+    
+    protected $_hiddenProperties = null;
 
     //////////////////////////////////////////////////////////////////////
     // MAGIC METHODS
     //////////////////////////////////////////////////////////////////////
 
-    public function __construct(Zend_Db_Table_Row $data = null)
+    public function __construct(Zend_Db_Table_Row $data = null, $hiddenProperties = array())
     {
         if ($data instanceof Zend_Db_Table_Row)
         {
@@ -23,6 +25,7 @@ abstract class Glo_Model_Dict
                 $this->_data[$key] = $value;
             }
         }
+        $this->_hiddenProperties = $hiddenProperties;
     }
     
     
@@ -58,6 +61,10 @@ abstract class Glo_Model_Dict
     public function toArray()
     {
         $data = $this->_data;
+        foreach ($this->_hiddenProperties as $prop) 
+        {
+            unset($data[$prop]);
+        }
 /*
         $user = App_Model_User::getLoggedIn();
         if ($user)

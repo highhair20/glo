@@ -3,13 +3,39 @@
 class Glo_Controller_Response_Http extends Zend_Controller_Response_Http {
 
     public function sendResponse() {
-        // get the content
-        $content = $this->getBody(false);
-        
+    
+        // get configs
         $registry = Zend_Registry::getInstance();
         $config = $registry->get('config');
         
+        // get front controller
         $frontController = Zend_Controller_Front::getInstance();
+
+        //
+        $this->sendHeaders();
+                
+        //        
+        $this->renderExceptions($frontController->getParam('displayExceptions'));
+        if ($this->isException() && $this->renderExceptions()) {
+            header('HTTP/1.1 400 Bad Request');
+            $exceptions = array();
+            foreach ($this->getException() as $i => $e) {
+                $exceptions['exceptions'][$i] = array(
+                    'type' => get_class($e),
+                    'message' => $e->getMessage(),
+                );
+                if ($frontController->getParam('displayExceptionsDetail'))
+                {
+                    $exceptions['exceptions'][$i]['detail'] = $e->getTrace();
+                }
+            }
+            echo json_encode($exceptions);
+            return;
+        }
+        
+        // get the content
+        $content = $this->getBody();
+
         $request = $frontController->getRequest();
         $requestData = json_decode($request->getRawBody());
         
@@ -29,7 +55,8 @@ class Glo_Controller_Response_Http extends Zend_Controller_Response_Http {
             {
                 mkdir($logDir);
             }
-            file_put_contents($logDir . $request->getHttpHost() . 'response.log', date('c') . " [RESPONSE]: " . $content . "\n", FILE_APPEND);
+            file_put_contents($logDir . $request->getHttpHost() . '-response.log', 
+                    date('c') . " [RESPONSE]: " . $request->getRequestUri() . " - " . $content . "\n", FILE_APPEND);
         }
         
         // gzip if needed
@@ -46,8 +73,9 @@ class Glo_Controller_Response_Http extends Zend_Controller_Response_Http {
         }
 */
         
-        echo $content;
-        return;
+/*         var_dump($content);exit; */
+        $this->outputBody();
     }
+    
     
 }

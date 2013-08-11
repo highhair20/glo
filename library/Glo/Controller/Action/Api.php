@@ -1,7 +1,5 @@
 <?php
-/**
- * Controller_Action
- */
+
 abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
     
 	public function assertIsAjaxRequest($errorMessage = NULL) {
@@ -20,6 +18,14 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
 		}
 	}
 	
+	public function preDispatch()
+	{
+        if ($this->getInvokeArg('noViewRenderer'))
+        {
+            $this->view = new stdClass();
+        }
+	}
+	
     public function init() {
         $data = $this->getRequestJson();
         if (!$data)
@@ -31,10 +37,11 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
             var_dump($data);
             
         }
-        if (array_key_exists('session_uuid', $data))
+        if (!isset($_SESSION) && array_key_exists('session_uuid', $data))
         {
-            $_COOKIE['app'] = $data['session_uuid'];
-            Glo_Session::start($data['session_uuid']);
+/*             $_COOKIE['app'] = $data['session_uuid']; */
+            Zend_Session::setId($data['session_uuid']);
+            Zend_Session::start();
         }
         
 /*         $this->loggedInUser = App_Model_User::getLoggedIn(); */
@@ -92,9 +99,9 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
                     // Malformed UTF-8 characters, possibly incorrectly encoded
                 default:
                     // Unknown error
-                    file_put_contents('/var/log/farmling/' . Util_Server::getEnvironmentString() . 'farmling-request.err', date('c') . ": " . print_r($_REQUEST, true) . "\n", FILE_APPEND);
-                    require_once 'Exception/InvalidRequest.php';
-                    throw new Exception_InvalidRequest('Sorry.  We are unable to process your request at this time.  Thanks for you patience');
+                    file_put_contents('/tmp/glo/' . $this->_request->getHttpHost() . '-request.err', date('c') . ": " . print_r($_REQUEST, true) . "\n", FILE_APPEND);
+                    require_once 'Glo/Exception/InvalidRequest.php';
+                    throw new Glo_Exception_InvalidRequest('Sorry.  We are unable to process your request at this time.  Thanks for you patience');
                     break;
             }
         }
