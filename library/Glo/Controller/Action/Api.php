@@ -59,7 +59,7 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
     public function getRequestJson($decoded = true)
     {
         // first try $_POST then look in raw post data
-        $frontController = $frontController = Zend_Controller_Front::getInstance();
+        $frontController = Zend_Controller_Front::getInstance();
         $request = $frontController->getRequest();
         $requestData = $request->getRawBody();
         
@@ -74,7 +74,11 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
         }
         if (!$requestData) 
         {
-            throw new Exception('no post data');
+            $requestData = $request->getParams();
+        }
+        if (!$requestData) 
+        {
+            throw new Glo_Exception_InvalidRequest('no post data');
             exit;
         }
 /*         var_dump($requestData); */

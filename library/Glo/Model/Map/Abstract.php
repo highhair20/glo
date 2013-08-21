@@ -31,7 +31,6 @@ abstract class Glo_Model_Map_Abstract
                 try
                 {
                     $response = $this->_getDbTable($dbAdapter)->insert($data);
-                    var_dump($response);
                 }
                 catch (Zend_Db_Statement_Exception $e)
                 {

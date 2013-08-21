@@ -17,19 +17,18 @@ class Glo_Controller_Response_Http extends Zend_Controller_Response_Http {
         //        
         $this->renderExceptions($frontController->getParam('displayExceptions'));
         if ($this->isException() && $this->renderExceptions()) {
-            header('HTTP/1.1 400 Bad Request');
             $exceptions = array();
             foreach ($this->getException() as $i => $e) {
-                $exceptions['exceptions'][$i] = array(
+                $exceptions['exception'] = array(
                     'type' => get_class($e),
                     'message' => $e->getMessage(),
                 );
                 if ($frontController->getParam('displayExceptionsDetail'))
                 {
-                    $exceptions['exceptions'][$i]['detail'] = $e->getTrace();
+                    $exceptions['exception']['detail'] = $e->getTrace();
                 }
             }
-            echo json_encode($exceptions);
+            echo 'callback(' . json_encode($exceptions) . ')';
             return;
         }
         
@@ -74,6 +73,7 @@ class Glo_Controller_Response_Http extends Zend_Controller_Response_Http {
 */
         
 /*         var_dump($content);exit; */
+        header('Access-Control-Allow-Origin: http://liv360.dev');
         $this->outputBody();
     }
     
