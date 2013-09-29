@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Glo_Util_Uuid
+ *
+ * @todo move to Glo_Uuid
+ */
 class Glo_Util_Uuid
 {
 
