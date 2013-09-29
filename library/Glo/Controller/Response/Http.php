@@ -28,7 +28,7 @@ class Glo_Controller_Response_Http extends Zend_Controller_Response_Http {
                     $exceptions['exception']['detail'] = $e->getTrace();
                 }
             }
-            echo 'callback(' . json_encode($exceptions) . ')';
+            echo json_encode($exceptions);
             return;
         }
         
@@ -73,7 +73,8 @@ class Glo_Controller_Response_Http extends Zend_Controller_Response_Http {
 */
         
 /*         var_dump($content);exit; */
-        header('Access-Control-Allow-Origin: http://liv360.dev');
+//        header('Access-Control-Allow-Origin: http://liv360.dev');
+//        header('Content-Type: application/javascript; charset=UTF-8');
         $this->outputBody();
     }
     

@@ -8,25 +8,22 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
     /**
      * signupAction
      *
-     * End Point:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * /auth/signup
-     * </pre>
+     * Request method: POST
+     *
+     * End Point: /auth/signup
+     *
+     * Parameters:
+     * - name
+     * - email
+     * - email_confirm
+     * - password
+     * - gender (optional)
+     * - birthday (optional)
+     * - vanity_url (optional)
      *
      * Sample Request:
      * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * {
-     *     "user_uuid": "e77a48ed-ff5a-4c12-9a59-5c48379d3160",
-     *     "email": "johndoe@gmail.com",
-     *     "password": "foomanchu",
-     *     "first_name": "John",
-     *     "last_name": "Doe",
-     *     "phone": "3454346534",
-     *     "timezone": "America/Los_Angeles",
-     *     "opt_in": "1",
-     *     "zip_code": "90802",
-     *     "type": "chef",      (options: farm, chef)
-     * }
+     * /auth/signup (data is in the POST)
      * </pre>
      *
      * Sample Response:
@@ -59,7 +56,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
             $identity = $response->getIdentity();
             $this->view->session_uuid = Zend_Session::getId();
             
-            $this->_helper->json($this->view);
+            $this->_helper->json($this->view); 
             
         } else {
             throw new Glo_Exception_BadData(array_shift(array_shift($form->getMessages())));
@@ -72,17 +69,17 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
     /**
      * loginAction
      * 
-     * End Point:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * /auth/login
-     * </pre>
+     * Request method: POST
+     *
+     * End Point: /auth/login
+     *
+     * Parameters:
+     * - email
+     * - password
      *
      * Sample Request:
      * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-        {
-            "email": "johndoe@gmail.com",
-            "password": "foomanchu",
-        }
+     * /auth/login (data is in the POST)
      * </pre>
      *
      * Sample Response:
@@ -112,7 +109,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
             $user = $map->findByEmail($identity);
             $this->view->user_uuid = $user->user_uuid;
 
-            $this->_helper->json($this->view);
+            $this->_helper->json($this->view); 
         }
         else
         {
@@ -125,18 +122,17 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
 
     /**
      * logoutAction
+     * 
+     * Request method: POST
      *
-     * End Point:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * /auth/logout
-     * </pre>
+     * End Point: /auth/logout
+     *
+     * Parameters:
+     * - user_uuid
      *
      * Sample Request:
      * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * {
-     *     "user_uuid":"e77a48ed-ff5a-4c12-9a59-5c48379d3160",
-     *     "session_uuid":"361092b7-d0b8-406c-8409-41db2853baf2"
-     * }
+     * /auth/logout (data is in the POST)
      * </pre>
      *
      * Sample Response:
@@ -158,8 +154,10 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
             var_dump($response);
 */
             Zend_Session::destroy();
+            unset($_COOKIE['app']);
             
-            $this->_helper->json($this->view);
+            $this->view->success = true;
+            $this->_helper->json($this->view); 
         }
         else
         {

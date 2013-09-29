@@ -37,11 +37,21 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
             var_dump($data);
             
         }
-        if (!isset($_SESSION) && array_key_exists('session_uuid', $data))
+        if (!isset($_SESSION))
         {
-/*             $_COOKIE['app'] = $data['session_uuid']; */
-            Zend_Session::setId($data['session_uuid']);
-            Zend_Session::start();
+            if (array_key_exists('session_uuid', $data))
+            {
+//                $_COOKIE['app'] = $data['session_uuid'];
+            }
+            elseif (array_key_exists('app', $_COOKIE))
+            {
+                $data['session_uuid'] = $_COOKIE['app'];
+            }
+            if (array_key_exists('session_uuid', $data))
+            {
+                Zend_Session::setId($data['session_uuid']);
+                Zend_Session::start();
+            }
         }
         
 /*         $this->loggedInUser = App_Model_User::getLoggedIn(); */
@@ -61,16 +71,12 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
         // first try $_POST then look in raw post data
         $frontController = Zend_Controller_Front::getInstance();
         $request = $frontController->getRequest();
-        $requestData = $request->getRawBody();
         
         // handle bad requests
-        if (!$requestData) 
+        $requestData = $this->_request->getPost();       
+        if (is_array($requestData))
         {
-            $requestData = $this->_request->getPost();
-            if (is_array($requestData))
-            {
-                $decoded = false;
-            }
+            $decoded = false;
         }
         if (!$requestData) 
         {
@@ -78,10 +84,16 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
         }
         if (!$requestData) 
         {
+            $requestData = $request->getRawBody();
+        }
+
+        if (!$requestData) 
+        {
             throw new Glo_Exception_InvalidRequest('no post data');
             exit;
         }
-/*         var_dump($requestData); */
+/*         var_dump($requestData);         */
+/*         var_dump($_REQUEST); */
 /*         var_dump(fopen("php://input", "rb")); */
         if ($decoded)
         {   
@@ -108,6 +120,10 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
                     throw new Glo_Exception_InvalidRequest('Sorry.  We are unable to process your request at this time.  Thanks for you patience');
                     break;
             }
+        }
+        if (isset($_COOKIE['app']))
+        {
+            $data['session_uuid'] = $_COOKIE['app'];
         }
         return $requestData;
     }
