@@ -52,7 +52,10 @@ abstract class Glo_Model_Map_Abstract
             {
                 // this is not a sequence and has a compound primary key
                 // so all members of the pk must be set
+                throw new Exception('Not Implemented');
+/*
                 $params = array();
+                $where = array();
                 foreach ($pks as $pk)
                 {
                     if (!isset($data[$pk]))
@@ -64,7 +67,8 @@ abstract class Glo_Model_Map_Abstract
                         $params[$pk . ' = ?'] = $data[$pk];
                     }
                 }
-                $response = $this->_getDbTable($dbAdapter)->insertOrUpdate($data);
+                $response = $this->_getDbTable($dbAdapter)->insertOrUpdate($data, $where);
+*/
             }
             else
             {
@@ -87,7 +91,8 @@ abstract class Glo_Model_Map_Abstract
                 else            
                 {
                     // we don't know if this is new data or not
-                    $response = $this->_getDbTable($dbAdapter)->insertOrUpdate($data);
+                    $where = $dbAdapter->quoteInto($pk . ' = ?', $data[$pk]);
+                    $response = $this->_getDbTable($dbAdapter)->insertOrUpdate($data, $where);
                 }
             }
         }

@@ -59,30 +59,35 @@ class Glo_Db_Table extends Zend_Db_Table
     public function update(array $data, $where)
     {
         $data = $this->_cleanData($data);
-        $rowCount = parent::update($data, $where);
-        if ($rowCount === 0)
-        {
-            throw new Glo_Db_Table_Row_NotFoundException("no data found for $where");
-        }
-        return $rowCount;
+        $response = parent::update($data, $where);
+        return $response;
     }
     
     
-    public function insertOrUpdate(array $data)
+    public function insertOrUpdate(array $data, $where)
     {
         $response = null;
-        $sql = "INSERT INTO " . $this->_name . " ("
-                    . implode(', ', array_keys($data)) 
-                . ") VALUES (" 
-                    . implode(', ', array_fill(0, count($data), '?'))
-                . ") ON DUPLICATE KEY UPDATE ";
-        $params = array();
-        foreach ($data as $k => $v)
+        try
         {
-            $params[] = $k . ' = ?';
+            $response = $this->update($data, $where);
+            $pks = $this->info('primary');
+            $response = array();
+            foreach ($pks as $pk)
+            {
+                $response[$pk] = $data[$pk];
+                if (count($response) == 1)
+                {
+                    $response = array_pop($response);
+                }
+            }
         }
-        $sql .= implode(', ', $params);
-        $response = $this->_db->query($sql, array_merge(array_values($data), array_values($data)));
+        catch (Zend_Db_Statement_Exception $e)
+        {
+            if ($e->getCode() == 23000 && strstr($e->getMessage(), '1062'))
+            {
+                $response = $this->insert($data);
+            }
+        }
         return $response;
     }
     
