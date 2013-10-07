@@ -40,7 +40,7 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
                 Glo_Auth_Storage_Session::setId($data['session_uuid']);
                 $storage = new Glo_Auth_Storage_Session('Glo_Auth');
                 $sessoinData = $storage->read();
-                if (!isset($data['user_uuid']) || $sessoinData->user_uuid != $data['user_uuid'])
+                if (!is_object($sessoinData) || !isset($data['user_uuid']) || $sessoinData->user_uuid != $data['user_uuid'])
                 {
                     throw new Exception('Your session is invalid.');
                 }
