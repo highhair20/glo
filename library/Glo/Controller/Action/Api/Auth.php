@@ -107,10 +107,17 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
             $data = $form->getValues();
             
             // authenticate
-            $auth = Glo_Auth::getInstance();
-            $response = $auth->authenticate($data['email'], $data['password']);
-            $identity = $response->getIdentity();
-            $this->view->session_uuid = Zend_Session::getId();
+            try
+            {
+                $auth = Glo_Auth::getInstance();
+                $response = $auth->authenticate($data['email'], $data['password']);
+                $identity = $response->getIdentity();
+                $this->view->session_uuid = Zend_Session::getId();
+            }
+            catch (Glo_Auth_Exception_Failed $e)
+            {
+                throw new Glo_Auth_Exception_Failed('Incorrect email/password combination.');
+            }
 
             $map = new App_Model_Map_User();
             $user = $map->findByEmail($identity);
