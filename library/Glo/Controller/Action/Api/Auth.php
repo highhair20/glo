@@ -46,9 +46,16 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
         if ($form->isValid($jsonData)) {
             $createData = $form->getValues();
             
-            // create user
-            $map = new App_Model_Map_User();
-            $this->view->user_uuid = $map->save($createData);
+            try
+            {
+                // create user
+                $map = new App_Model_Map_User();
+                $this->view->user_uuid = $map->save($createData);
+            }
+            catch (Glo_Exception_DuplicateData $e)
+            {
+                throw new Glo_Exception_DuplicateData('This email address is already in use.');            
+            }
             
             // authenticate
             $auth = Glo_Auth::getInstance();

@@ -93,7 +93,7 @@ class Glo_Auth
          
         // Set the storage interface
         $this->_auth->setStorage(new Glo_Auth_Storage_Session('Glo_Auth'));
-        
+
         // Set the identity on the adapter
         $this->_adapter->setIdentity($username);
         
@@ -106,6 +106,12 @@ class Glo_Auth
         if (!$result->isValid()) {
             // Authentication failed
             throw new Glo_Auth_Exception_Failed(array_shift($result->getMessages()));
+        }
+        else
+        {
+            $data = $this->_adapter->getResultRowObject(array('user_uuid'));
+            $storage = $this->_auth->getStorage();
+            $storage->write($data);
         }
         return $result;
     }
@@ -141,4 +147,6 @@ class Glo_Auth
         $this->_auth = Zend_Auth::getInstance();
         return $this->_auth->clearIdentity();
     }
+    
+
 }

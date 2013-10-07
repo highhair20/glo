@@ -32,27 +32,22 @@ abstract class Glo_Controller_Action_Api extends Zend_Controller_Action {
         {
             $data = $this->getRequest();
         }
-        if (is_numeric($data))
-        {
-            var_dump($data);
-            
+
+        if (array_key_exists('session_uuid', $data))
+        {   
+            if (!Zend_Session::isStarted())
+            {
+                Glo_Auth_Storage_Session::setId($data['session_uuid']);
+                $storage = new Glo_Auth_Storage_Session('Glo_Auth');
+                $sessoinData = $storage->read();
+                if (!isset($data['user_uuid']) || $sessoinData->user_uuid != $data['user_uuid'])
+                {
+                    throw new Exception('Your session is invalid.');
+                }
+            }
+
         }
-        if (!isset($_SESSION))
-        {
-            if (array_key_exists('session_uuid', $data))
-            {
-//                $_COOKIE['app'] = $data['session_uuid'];
-            }
-            elseif (array_key_exists('app', $_COOKIE))
-            {
-                $data['session_uuid'] = $_COOKIE['app'];
-            }
-            if (array_key_exists('session_uuid', $data))
-            {
-                Zend_Session::setId($data['session_uuid']);
-                Zend_Session::start();
-            }
-        }
+
         
 /*         $this->loggedInUser = App_Model_User::getLoggedIn(); */
         
