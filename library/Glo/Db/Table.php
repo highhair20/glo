@@ -21,7 +21,7 @@ class Glo_Db_Table extends Zend_Db_Table
     }
 
 
-    protected function _addHiddenCol($colName)
+    public function addHiddenCol($colName)
     {
         $this->_hiddenCols[] = $colName;
     }
