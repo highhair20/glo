@@ -182,7 +182,48 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
     }
     
     
-    
+    /**
+     * changePasswordAction
+     *
+     * Request method: POST
+     *
+     * End Point: /auth/change-password
+     *
+     * Parameters:
+     * - user_uuid "e77a48ed-ff5a-4c12-9a59-5c48379d3160"
+     * - session_uuid "361092b7-d0b8-406c-8409-41db2853baf2"
+     * - password_old "oldpass"
+     * - password_new "newpass"
+     * - password_confirm "newpass"
+     *
+     * Sample Request:
+     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
+     * /auth/change-password (data is in the POST)
+     * </pre>
+     *
+     * Sample Response:
+     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
+     * {}
+     * </pre>
+     *
+     * @return void
+     */
+    public function changePasswordAction()
+    {
+        $form = new App_Form_Auth_ChangePassword();
+        if ($form->isValid($this->getRequestJson())) {
+            $data = $form->getValues();
+            $data['password'] = $data['password_new'];
+            $map = new App_Model_Map_User();
+            $user = $map->save($data);
+
+        } else {
+            throw new Glo_Exception_BadData(array_shift(array_shift($form->getMessages())));
+            
+        }
+        
+        $this->_helper->json($this->view); 
+    }
     
     
     
@@ -199,46 +240,7 @@ class Glo_Controller_Action_Api_Auth extends Glo_Controller_Action_Api
     //////////////////////
     
      
-    /**
-     * changePasswordAction
-     *
-     * End Point:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * /auth/change-password
-     * </pre>
-     *
-     * Sample Request:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * {
-     *     "user_uuid": "e77a48ed-ff5a-4c12-9a59-5c48379d3160",
-     *     "session_uuid": "361092b7-d0b8-406c-8409-41db2853baf2",
-     *     "password_old": "oldpass",
-     *     "password_new": "newpass"
-     * }
-     * </pre>
-     *
-     * Sample Response:
-     * <pre style="border: 1px solid #3D578C; background: #E2E8F2">
-     * {}
-     * </pre>
-     *
-     * @return void
-     */
-/*
-    public function changePasswordAction()
-    {
-        $form = new App_Form_AuthChangePassword();
-        if ($form->isValid($this->getRequestJson())) {
-            App_Model_User::changePassword($form->getValues());
 
-        } else {
-            throw new Exception_BadData(array_shift(array_shift($form->getMessages())));
-            
-        }
-        
-        $this->render('common/json', NULL, true);
-    }
-*/
 
 
     /**

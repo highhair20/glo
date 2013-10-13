@@ -10,40 +10,7 @@ class Glo_Model_Set implements Iterator
     private $_hasNextSet = false;
     private $_hasPrevSet = false;
     private $_pageIndex = 0;
-/*     private $_maxUpdateTimestamp = NULL; */
-    
-    
-    /**
-     * Constructor
-     * @param object - standard moodhit collection defined in the client
-     */
-/*
-    public function __construct($collectionData = NULL) 
-    {
-        if ($collectionData) 
-        {
-            if (!is_array($collectionData)) 
-            {
-                debug_print_backtrace();
-            }
-            if ($collectionData['recordOffset'] > 0) 
-            {
-                $this->_isNewerSetAvailable = TRUE;
-            }
-            $this->_isOlderSetAvailable = $collectionData['moreDataAvailable'];
-            if ($collectionData['recordOffset'] && $collectionData['maxNumRecords']) 
-            {
-                $this->_pageIndex = $collectionData['recordOffset'] / $collectionData['maxNumRecords'];    
-            } 
-            else 
-            {
-                $this->_pageIndex = 0;
-            }
-            $this->_maxUpdateTimestamp = $collectionData['maxUpdateTimestamp'];
-            return $this->_init($collectionData);
-        }
-    }
-*/
+
 
     
     /**
