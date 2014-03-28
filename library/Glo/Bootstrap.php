@@ -12,6 +12,7 @@ class Glo_Bootstrap
             '/var/www/vhosts/jason-api.liv360.com/glo-framework/library',
             realpath(APPLICATION_PATH . '/../glo-generated'),
             realpath(APPLICATION_PATH . '/../library'),
+            realpath(APPLICATION_PATH . '/../vendor'),
             get_include_path(),
         )));
         

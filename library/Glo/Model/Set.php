@@ -141,14 +141,31 @@ class Glo_Model_Set implements Iterator
     
     public function toArray()
     {
-        $arr = array(
-            'hasNextSet'    => $this->_hasNextSet,
-            'hasPrevSet'    => $this->_hasPrevSet,
-            'data'          => array()
-        );
-        foreach ($this->_array as $item)
+        $arr = array();
+        $vars = get_object_vars($this);
+        foreach ($vars as $var => $val)
         {
-            $arr['data'][] = $item->toArray();
+            switch ($var)
+            {
+                case '_hasNextSet':
+                    $arr['hasNextSet'] = $val;
+                    break;
+                case '_hasPrevSet':
+                    $arr['hasPrevSet'] = $val;
+                    break;
+                case '_array':
+                    $arr['data'] = array();
+                    foreach ($val as $item)
+                    {
+                        $arr['data'][] = $item->toArray();
+                    }
+                    break;
+                case '_valid':
+                case '_pageIndex':
+                    break;
+                default:
+                    $arr[$var] = $val;
+            }
         }
         return $arr;
     }

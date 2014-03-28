@@ -115,6 +115,23 @@ class Glo_Auth
         }
         return $result;
     }
+    
+    
+    public function forceAuthenticate($userUuid)
+    {
+        // Get a reference to the singleton instance of Zend_Auth
+        $this->_auth = Zend_Auth::getInstance();
+         
+        // Set the storage interface
+        $this->_auth->setStorage(new Glo_Auth_Storage_Session('Glo_Auth'));
+        
+        $storage = $this->_auth->getStorage();
+        $data = new stdClass();
+        $data->user_uuid = $userUuid;
+        $storage->write($data);
+        return;
+    }
+
 
     /**
      * Returns true if and only if an identity is available from storage
