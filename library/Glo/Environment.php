@@ -5,6 +5,7 @@ class Glo_Environment
     
     const ENV_DEV_JASON         = 'jason';
     const ENV_DEV_ANDREW        = 'andrew';
+    const ENV_DEV_ASH           = 'ash';
     
     const ENV_QA                = 'qa';
     
