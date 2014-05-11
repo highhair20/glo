@@ -55,7 +55,7 @@ class Glo_Environment
     public static function getEnvironmentString()
     {
         $envString = '';
-        $env = self::getEnvironment();
+        $env = self::get();
         if ($env != self::ENV_PRODUCTION)
         {
             $envString = "$env-";
